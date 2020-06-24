@@ -49,4 +49,44 @@
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#FFFFFF"
+        android:visibility="gone"
+        android:id="@+id/relativeLayout">
+
+        <ImageView
+            android:layout_width="240dp"
+            android:layout_height="240dp"
+            android:src="@drawable/no_internet"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/imgNoConnection"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="No Internet Connection"
+            android:layout_below="@id/imgNoConnection"
+            android:textSize="25sp"
+            android:textAlignment="center"
+            android:id="@+id/txtInfo"/>
+
+        <Button
+            android:layout_width="150dp"
+            android:layout_height="50dp"
+            android:text="Retry"
+            android:textColor="#FFFFFF"
+            android:background="@color/colorPrimaryDark"
+            android:textSize="22sp"
+            android:layout_below="@id/txtInfo"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/btnRetry"
+            android:onClick="retryConnection"
+            android:layout_marginTop="40dp"/>
+
+
+    </RelativeLayout>
+
 </RelativeLayout>

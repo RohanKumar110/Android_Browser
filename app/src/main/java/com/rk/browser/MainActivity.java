@@ -14,6 +14,8 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -38,6 +40,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -56,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     ProgressBar progressbar;
     SwipeRefreshLayout swipeRefreshLayout;
     ProgressDialog progressDialog;
+    RelativeLayout relativeLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
             webView.post(new Runnable() {
                 @Override
                 public void run() {
-                    webView.loadUrl(link);
+                    checkConnection();
                 }
             });
         }
@@ -97,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 editText.setText(webView.getUrl());
+                swipeRefreshLayout.setRefreshing(false);
                 super.onPageFinished(view, url);
             }
 
@@ -120,7 +125,6 @@ public class MainActivity extends AppCompatActivity {
                 progressDialog.show();
                 if(newProgress == 100)
                 {
-                    swipeRefreshLayout.setRefreshing(false);
                     progressbar.setVisibility(View.INVISIBLE);
                     setTitle("Browser");
                     progressDialog.dismiss();
@@ -181,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                webView.reload();
+                checkConnection();
             }
         });
 
@@ -203,6 +207,8 @@ public class MainActivity extends AppCompatActivity {
         webView = findViewById(R.id.webView);
         progressbar = findViewById(R.id.progressBar);
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
+        relativeLayout = findViewById(R.id.relativeLayout);
+
         progressDialog = new ProgressDialog(this);
         progressDialog.setTitle("Loading...");
         progressDialog.setMessage("Please Wait");
@@ -285,6 +291,33 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void retryConnection(View view) {
+        checkConnection();
+    }
+
+    private void checkConnection() {
+
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        NetworkInfo mobile = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+
+        if(wifi.isConnected()){
+            webView.loadUrl(link);
+            webView.setVisibility(View.VISIBLE);
+            relativeLayout.setVisibility(View.GONE);
+        }
+        else if(mobile.isConnected()){
+            webView.loadUrl(link);
+            webView.setVisibility(View.VISIBLE);
+            relativeLayout.setVisibility(View.GONE);
+        }
+        else
+        {
+            webView.setVisibility(View.GONE);
+            relativeLayout.setVisibility(View.VISIBLE);
+        }
     }
 
     private class ChromeClient extends WebChromeClient {
